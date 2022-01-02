@@ -1,7 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const router = require('./routers/userRouter');
-var bodyParser = require('body-parser')
+var bodyParser = require('body-parser');
+const auth = require('./middlewares/authUser');
 const app = express();
 require('dotenv').config();
 const port =process.env.PORT || 3000
@@ -15,8 +16,9 @@ app.use(bodyParser.json())
 require('./DB/db')
 
 // Routing
-app.use('/api',router)
-app.get('/', (req, res) => {
+app.use('/api', router)
+
+app.get('/',auth, (req, res) => {
     res.send("hello")
 })
 
