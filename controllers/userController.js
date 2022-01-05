@@ -2,10 +2,14 @@ const User = require("../models/userMode");
 const bcrypt = require("bcrypt");
 var jwt = require("jsonwebtoken");
 require("dotenv").config();
+
+
+// ######## User registration #########
+
 const registration = async (req, res) => {
   const emailExist = await User.findOne({ email: req.body.email });
   if (emailExist) {
-    return res.status(400).json({ mess: "User already signin" });
+    return res.status(400).json({ mess: "User already SignUp" });
   }
   const user = new User({
     name: req.body.name,
@@ -13,22 +17,23 @@ const registration = async (req, res) => {
     password: req.body.password,
   });
   try {
-    const saveUser = await user.save();
-    res.status(200).json({ mess: "registration sucessfull" });
+    await user.save();
+    res.status(201).json({ mess: "Registration sucessfull" });
   } catch (error) {
-    res.status(400).json({ mess: "this is server err" });
+    res.status(500).json({ mess:"Server Error" });
   }
 };
 
+// ######## User Login #########
 const login = async (req, res) => {
   const user = await User.findOne({ email: req.body.email });
   if (!user) {
-    return res.status(400).json({ mess: "User Email is worng" });
+    return res.status(401).json({ mess: "User Email is not SignUp" });
   }
   const validPass = await bcrypt.compare(req.body.password, user.password);
 
   if (!validPass) {
-    return res.status(400).json({ mess: "User password is worng" });
+    return res.status(400).json({ mess: "User password is Valid" });
   }
 
   const value = {
@@ -42,12 +47,12 @@ const login = async (req, res) => {
   res.status(200).json({ token: Token });
 };
 
-// post
+// ########## User forgot Password ############
 const forgotPassword = async (req, res) => {
-  const user = await User.findOne({ email: req.body.email});
+  const user = await User.findOne({ email: req.body.email });
 
   if (!user) {
-    res.send("email not registrared");
+    res.status(401).json("email not registrared");
     return;
   }
   const secret = process.env.TOKEN + user.password;
@@ -56,57 +61,61 @@ const forgotPassword = async (req, res) => {
     id: user._id,
   };
   const token = jwt.sign(payloade, secret, { expiresIn: "15m" });
-  const link = `localhost:5000/api/reset-password/${user._id}/${token}`;
-  console.log(link);
-  res.send("password send email");
+  try {
+    
+    const link = `localhost:5000/api/reset-password/${user._id}/${token}`;
+    console.log(link);
+    res.status(200).json("password send email");
+  } catch (error) {
+    res.status(404).json("Not Found")
+  }
 };
 
 // get
-const resetPassword = async (req, res) => {
-  const { id, token } = req.params;
-  const user = await User.findOne({ _id:id });
+const getresetPassword = async (req, res) => {
+  const user = await User.findOne({ _id: req.params.id });
+  // res.send(user);
 
-  if (id !== user._id) {
-    req.send("invalated id");
+  if (user.id !== req.params.id) {
+    return res.status(400).json({ mess: "id is not valited" });
   }
 
   const secret = process.env.TOKEN + user.password;
   try {
-    const payload = jwt.verify(token, secret);
+    jwt.verify(req.params.token, secret);
     res.render("reset-password", { email: user.email });
+
   } catch (error) {
     console.log(error.messages);
-    res.send(error.messages);
+    res.send("invalated token");
   }
 };
 
-const postResetPassword = async(req, res) => {
-  const { id, token } = req.params;
-  const { password, confirmpassword } = req.body;
-  const user = await User.findOne({ _id: id });
-  if (id !== user._id) {
-    req.send("invalated id");
+// ############# User Reset Password ################
+
+const ResetPassword = async (req, res) => {
+  const user = await User.findOne({ _id: req.params.id });
+  if (user.id !== req.params.id) {
+    return res.status(401).json({ mess: "User id is not valited" });
   }
+
   const secret = process.env.TOKEN + user.password;
-  const payload = jwt.verify(token, secret);
+  jwt.verify(req.params.token, secret);
+
   try {
-    if (password === confirmpassword) {
-      const user = new User({
-        password: req.body.password,
-      });
-      user.save();
-      res.send("Password Change Sucessfull");
-    }
+    user.password = req.body.password;
+    await user.save();
+    res.render("index");
+    // res.status(201).json({ mess: "Password change sucessfully" });
   } catch (error) {
-    console.log(error.messages);
-    res.send(error.messages);
+    res.status(201).json("invalated token");
   }
 };
 
 module.exports = {
   registration,
   login,
+  getresetPassword,
   forgotPassword,
-  resetPassword,
-  postResetPassword,
+  ResetPassword,
 };

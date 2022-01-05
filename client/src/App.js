@@ -8,6 +8,7 @@ import Navbar from "./components/Navbar";
 import Login from "./components/Login";
 import ChangeEmail from "./components/ChangePassword";
 import NotFound from "./components/NotFound";
+import ForgotEmail from "./components/ForgotEmail";
 
 function App() {
   const tok = localStorage.getItem("token");
@@ -20,6 +21,7 @@ function App() {
         <Switch>
           <Route exact path="/registration" component={Registration } />
           <Route exact path="/login" component={Login } />
+        <Route exact path="/forgotEmail" component={ForgotEmail} />
           <Redirect to="/login" />
         </Switch>
       </>
@@ -31,7 +33,7 @@ function App() {
           <Route exact path="/changeemail" component={ChangeEmail} />
           <Route exact path="/" component={Home} />
           <Redirect to="/" /> 
-          <Route component={NotFound } />
+          <Route component={NotFound} />
         </Switch>
       </>
     );

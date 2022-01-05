@@ -1,5 +1,6 @@
 import axios from "axios";
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 
 export default function Login() {
@@ -78,6 +79,8 @@ export default function Login() {
             </button>
           </form>
         </div>
+        <div className="text-center"><Link to="/forgotEmail">Forgotten password?</Link></div>
+        
       </div>
     </div>
   );
