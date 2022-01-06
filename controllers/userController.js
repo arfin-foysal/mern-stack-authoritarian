@@ -1,6 +1,7 @@
 const User = require("../models/userMode");
 const bcrypt = require("bcrypt");
 var jwt = require("jsonwebtoken");
+const sendMaile = require("../middlewares/sendMaile");
 require("dotenv").config();
 
 
@@ -63,8 +64,9 @@ const forgotPassword = async (req, res) => {
   const token = jwt.sign(payloade, secret, { expiresIn: "15m" });
   try {
     
-    const link = `localhost:5000/api/reset-password/${user._id}/${token}`;
-    console.log(link);
+    const link = `http://localhost:5000/api/reset-password/${user._id}/${token}`;
+    sendMaile(user.email,"password reset",link)
+    // console.log(link);
     res.status(200).json("password send email");
   } catch (error) {
     res.status(404).json("Not Found")
