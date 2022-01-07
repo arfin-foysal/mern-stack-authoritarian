@@ -18,7 +18,8 @@ module.exports = async (email, subject, Link) => {
             subject: subject, // Subject line
             text:Link, // plain text body
            html: `
-           <a href=${Link}>click</a>
+           
+            ${Link}
             `, // html body
         });
         
