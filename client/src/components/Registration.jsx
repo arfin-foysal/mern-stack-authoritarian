@@ -1,8 +1,10 @@
 import axios from "axios";
 import React, { useState } from "react";
+import { Link, useHistory } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 
 export default function Registration() {
+  const history = useHistory();
   const URL = "http://localhost:5000";
   const [input, setInput] = useState({
     name: "",
@@ -26,10 +28,15 @@ export default function Registration() {
       const res = await axios.post(URL + "/api/Registration", input, {
         headers,
       });
-      console.log(res.data.mess);
       toast.success(res.data.mess);
+      // console.log(res.data.mess);
+      if (res.status === 200) {
+        setTimeout(() => {
+          history.push("/");
+        }, 3000);
+      }
     } catch (Error) {
-      console.log(Error.response.data.mess);
+      // console.log(Error.response.data.mess);
       toast.error(Error.response.data.mess);
     }
   };
@@ -93,6 +100,11 @@ export default function Registration() {
               Submit
             </button>
           </form>
+        </div>
+        <div className="text-center">
+          <p>
+            Have an account?<Link to="/login">Log in now</Link>
+          </p>
         </div>
       </div>
     </div>

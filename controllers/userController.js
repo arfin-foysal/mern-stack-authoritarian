@@ -19,7 +19,7 @@ const registration = async (req, res) => {
   });
   user.save();
 
-  const secret = process.env.TOKEN
+  const secret = process.env.TOKEN;
   const payloade = {
     email: user.email,
     id: user._id,
@@ -28,8 +28,8 @@ const registration = async (req, res) => {
   try {
     const link = `http://localhost:5000/api/verify/${user._id}/${token}`;
 
-    await sendMaile(user.email, "User Email Verifiquation", link);
-    res.json({ mess: "email send to account Verifi" });
+    await sendMaile(user.email, "Email Verification", link);
+    res.json({ mess: "send to email and verify your account" });
   } catch (error) {
     res.status(404).json("Server Error");
   }
@@ -39,17 +39,17 @@ const registration = async (req, res) => {
 
 const verifyUser = async (req, res) => {
   const user = await User.findOne({ _id: req.params.id });
- 
+
   if (!user) {
-    return res.status(401).json({ mess: "invalited link" });
+    return res.status(401).json({ mess: "Invalid link" });
   }
-  const secret = process.env.TOKEN
+  const secret = process.env.TOKEN;
   try {
-    jwt.verify(req.params.token,secret);
-    await User.updateOne({_id:req.params.id}, {$set:{verified:true}})
+    jwt.verify(req.params.token, secret);
+    await User.updateOne({ _id: req.params.id }, { $set: { verified: true } });
     res.render("veryfi");
   } catch (error) {
-    res.status(400).json({mess:"invalated token"});
+    res.status(400).json({ mess: "Invalid link" });
   }
 };
 
@@ -57,15 +57,15 @@ const verifyUser = async (req, res) => {
 const login = async (req, res) => {
   const user = await User.findOne({ email: req.body.email });
   if (!user) {
-    return res.status(401).json({ mess: "User Email is not SignUp" });
+    return res.status(401).json({ mess: "User email is not SignUp" });
   }
   const validPass = await bcrypt.compare(req.body.password, user.password);
 
   if (!validPass) {
-    return res.status(400).json({ mess: "User password is Valid" });
+    return res.status(400).json({ mess: "User password is not valid" });
   }
   if (!user.verified) {
-    return res.status(404).json({mess:"User is not active"})
+    return res.status(404).json({ mess: "User is not verified" });
   }
 
   const value = {
@@ -84,8 +84,8 @@ const forgotPassword = async (req, res) => {
   const user = await User.findOne({ email: req.body.email });
 
   if (!user) {
-    res.status(401).json("email not registrared");
-    return;
+    return res.status(401).json({mess:"Email not registrared"});
+    
   }
   const secret = process.env.TOKEN + user.password;
   const payloade = {
@@ -96,20 +96,17 @@ const forgotPassword = async (req, res) => {
   try {
     const link = `http://localhost:5000/api/reset-password/${user._id}/${token}`;
     sendMaile(user.email, "password reset", link);
-    // console.log(link);
-    res.status(200).json("password send email");
+    res.status(200).json({mess:"Send email to reset your Password"});
   } catch (error) {
-    res.status(404).json("Not Found");
+    res.status(404).json({mess:"Not Found"});
   }
 };
 
 // ############# get User Reset Password ################
 const getresetPassword = async (req, res) => {
   const user = await User.findOne({ _id: req.params.id });
-  // res.send(user);
-
   if (user.id !== req.params.id) {
-    return res.status(400).json({ mess: "id is not valited" });
+    return res.status(400).json({ mess: "Invalid link" });
   }
 
   const secret = process.env.TOKEN + user.password;
@@ -118,7 +115,7 @@ const getresetPassword = async (req, res) => {
     res.render("reset-password", { email: user.email });
   } catch (error) {
     console.log(error.messages);
-    res.send("invalated token");
+    res.status(400).json({ mess: "Invalid link" });
   }
 };
 
@@ -127,7 +124,7 @@ const getresetPassword = async (req, res) => {
 const ResetPassword = async (req, res) => {
   const user = await User.findOne({ _id: req.params.id });
   if (user.id !== req.params.id) {
-    return res.status(401).json({ mess: "User id is not valited" });
+    return res.status(401).json({ mess: "User is not valid" });
   }
 
   const secret = process.env.TOKEN + user.password;
@@ -139,7 +136,7 @@ const ResetPassword = async (req, res) => {
     res.render("index");
     // res.status(201).json({ mess: "Password change sucessfully" });
   } catch (error) {
-    res.status(201).json("invalated token");
+    res.status(400).json("Invalid link");
   }
 };
 

@@ -11,17 +11,16 @@ import NotFound from "./components/NotFound";
 import ForgotEmail from "./components/ForgotEmail";
 
 function App() {
-  const tok = localStorage.getItem("token");
-  let userRoute
-  let Atoken =tok;
+
+  let userRoute;
+  const Atoken = localStorage.getItem("token");
   if (Atoken === null) {
-   
     userRoute = (
       <>
         <Switch>
-          <Route exact path="/registration" component={Registration } />
-          <Route exact path="/login" component={Login } />
-        <Route exact path="/forgotEmail" component={ForgotEmail} />
+          <Route exact path="/registration" component={Registration} />
+          <Route exact path="/login" component={Login} />
+          <Route exact path="/forgotEmail" component={ForgotEmail} />
           <Redirect to="/login" />
         </Switch>
       </>
@@ -29,10 +28,11 @@ function App() {
   } else {
     userRoute = (
       <>
+        <Navbar />
         <Switch>
           <Route exact path="/changeemail" component={ChangeEmail} />
           <Route exact path="/" component={Home} />
-          <Redirect to="/" /> 
+          <Redirect to="/" />
           <Route component={NotFound} />
         </Switch>
       </>
@@ -40,10 +40,7 @@ function App() {
   }
   return (
     <>
-      <BrowserRouter>
-        <Navbar />
-        {userRoute}
-      </BrowserRouter>
+      <BrowserRouter>{userRoute}</BrowserRouter>
     </>
   );
 }
