@@ -75,6 +75,7 @@ const login = async (req, res) => {
   };
 
   var Token = jwt.sign(value, process.env.TOKEN, { expiresIn: "2h" });
+  localStorage.setItem("token",token)
 
   res.status(200).json({ token: Token });
 };

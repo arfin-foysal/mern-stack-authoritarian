@@ -6,6 +6,13 @@ import { ToastContainer, toast } from "react-toastify";
 
 
 export default function Login() {
+
+  const google = () => {
+  window.open("http://localhost:5000/api/google",'_self')
+}
+
+
+
   const URL = "http://localhost:5000";
   const [input, setInput] = useState({
     email: "",
@@ -81,9 +88,12 @@ export default function Login() {
               </button>
             </form>
           </div>
-          <div className="text-center">
+        <div className="text-center">
+          <div>
+            <button className="btn btn-info" onClick={google} >Google</button>
+          </div>
             <p>
-              Don't have an account? <Link to="/registration"> Sign Up</Link>
+              Don't have an account? <Link to="/registration" > Sign Up</Link>
             </p>
           </div>
           <div className="text-center">
