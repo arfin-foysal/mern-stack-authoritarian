@@ -7,9 +7,9 @@ import { ToastContainer, toast } from "react-toastify";
 
 export default function Login() {
 
-  const google = () => {
-  window.open("http://localhost:5000/api/google",'_self')
-}
+//   const google = () => {
+//   window.open("http://localhost:5000/api/google",'_self')
+// }
 
 
 
@@ -90,7 +90,7 @@ export default function Login() {
           </div>
         <div className="text-center">
           <div>
-            <button className="btn btn-info" onClick={google} >Google</button>
+            {/* <button className="btn btn-info" onClick={google} >Google</button> */}
           </div>
             <p>
               Don't have an account? <Link to="/registration" > Sign Up</Link>

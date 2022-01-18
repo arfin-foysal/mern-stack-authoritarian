@@ -74,10 +74,12 @@ const login = async (req, res) => {
     email: user.email,
   };
 
-  var Token = jwt.sign(value, process.env.TOKEN, { expiresIn: "2h" });
-  localStorage.setItem("token",token)
+  const Token = jwt.sign(value, process.env.TOKEN, { expiresIn: "50s" });
+  const refreshToken = jwt.sign(value, process.env.REFRESH_TOKEN, {
+    expiresIn: "1y",
+  });
 
-  res.status(200).json({ token: Token });
+  res.status(200).json({ token: Token, refreshToken: refreshToken });
 };
 
 // ########## User forgot Password ############
@@ -85,8 +87,7 @@ const forgotPassword = async (req, res) => {
   const user = await User.findOne({ email: req.body.email });
 
   if (!user) {
-    return res.status(401).json({mess:"Email not registrared"});
-    
+    return res.status(401).json({ mess: "Email not registrared" });
   }
   const secret = process.env.TOKEN + user.password;
   const payloade = {
@@ -97,9 +98,9 @@ const forgotPassword = async (req, res) => {
   try {
     const link = `http://localhost:5000/api/reset-password/${user._id}/${token}`;
     sendMaile(user.email, "password reset", link);
-    res.status(200).json({mess:"Send email to reset your Password"});
+    res.status(200).json({ mess: "Send email to reset your Password" });
   } catch (error) {
-    res.status(404).json({mess:"Not Found"});
+    res.status(404).json({ mess: "Not Found" });
   }
 };
 
@@ -141,6 +142,10 @@ const ResetPassword = async (req, res) => {
   }
 };
 
+const refreshToken = ((req, res) => {
+  
+})
+
 module.exports = {
   registration,
   login,
@@ -148,4 +153,5 @@ module.exports = {
   forgotPassword,
   ResetPassword,
   verifyUser,
+  refreshToken
 };
